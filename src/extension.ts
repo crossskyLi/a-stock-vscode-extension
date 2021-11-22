@@ -2,36 +2,38 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import axios from 'axios';
+import { StockItem } from './type';
+import {
+  intervalHandle,
+  calcFixedNumber,
+  getStockCodes,
+  isShowTime,
+  getUpdateInterval,
+  getItemColor,
+} from './utils';
+
+import { getTooltipText, getItemText } from './render';
+import { fetchAllData } from './api';
+
 let statusBarItems: Record<string, any> = {};
 let stockCodes: string[] = [];
 let updateInterval = 10000;
 let timer: NodeJS.Timeout | null = null;
 let showTimer: NodeJS.Timeout | null = null;
 
-interface StockItem {
-  name: string;
-  price: string;
-  percent: number;
-  type: string;
-  symbol: string;
-  updown: string;
-  high: string;
-  low: string;
-  open: string;
-  yestclose: number;
-  code: string;
-}
-
 function initShowTimeChecker() {
-  showTimer && clearInterval(showTimer);
-  showTimer = setInterval(() => {
-    if (isShowTime()) {
-      init();
-    } else {
+  intervalHandle(
+    showTimer,
+    () => {
       timer && clearInterval(timer);
-      hideAllStatusBar();
-    }
-  }, 1000 * 60 * 10);
+      if (isShowTime()) {
+        init();
+      } else {
+        hideAllStatusBar();
+      }
+    },
+    1000 * 60 * 10,
+  );
 }
 
 function hideAllStatusBar() {
@@ -53,99 +55,6 @@ function handleConfigChange() {
     }
   });
   init();
-}
-
-function getStockCodes() {
-  const config = vscode.workspace.getConfiguration();
-  const stocks: string[] | undefined = config.get('stock-watch.stocks');
-  if (!stocks) {
-    return [];
-  }
-  return stocks.map((code: string = '') => {
-    if (isNaN(Number(code[0]))) {
-      if (code.toLowerCase().indexOf('us_') > -1) {
-        return code.toUpperCase();
-      } else if (code.indexOf('hk') > -1) {
-        return code;
-      } else {
-        return code.toLowerCase().replace('sz', '1').replace('sh', '0');
-      }
-    } else {
-      return (code[0] === '6' ? '0' : '1') + code;
-    }
-  });
-}
-
-function getUpdateInterval(): number {
-  const config = vscode.workspace.getConfiguration();
-  return config.get('stock-watch.updateInterval') || 3000;
-}
-
-function isShowTime() {
-  const config = vscode.workspace.getConfiguration();
-  const configShowTime = config.get('stock-watch.showTime');
-  let showTime = [0, 23];
-  if (
-    Array.isArray(configShowTime) &&
-    configShowTime.length === 2 &&
-    configShowTime[0] <= configShowTime[1]
-  ) {
-    showTime = configShowTime;
-  }
-  const now = new Date().getHours();
-  return now >= showTime[0] && now <= showTime[1];
-}
-
-function getItemText(item: StockItem) {
-  return `${item.name} ${keepDecimal(
-    item.price,
-    calcFixedNumber(item),
-  )} ${item.percent >= 0 ? '⬆' : '⬇'} ${keepDecimal(item.percent * 100, 2)}%`;
-}
-
-function getTooltipText(item: StockItem) {
-  return `
-    code: ${item.type}${item.symbol}
-		updown: ${item.updown}  percent: ${keepDecimal(item.percent * 100, 2)}%
-	  high: ${item.high}   low: ${item.low}
-    opening:${item.open} last：${item.yestclose}
-  `;
-}
-
-function getItemColor(item: StockItem): string {
-  const config = vscode.workspace.getConfiguration();
-  const riseColor: string = config.get('stock-watch.riseColor') || '#444';
-  const fallColor: string = config.get('stock-watch.fallColor') || '#222';
-
-  return item.percent >= 0 ? riseColor : fallColor;
-}
-
-function fetchAllData() {
-  const baseUrl = 'https://api.money.126.net/data/feed/';
-
-  axios
-    .get(`${baseUrl}${stockCodes.join(',')}?callback=a`)
-    .then(
-      (rep) => {
-        try {
-          const result = JSON.parse(rep.data.slice(2, -2));
-          const data: StockItem[] = [];
-          Object.keys(result).map((item) => {
-            if (!result[item].code) {
-              result[item].code = item; //兼容港股美股
-            }
-            data.push(result[item]);
-          });
-          displayData(data);
-        } catch (error) {}
-      },
-      (error) => {
-        console.error(error);
-      },
-    )
-    .catch((error) => {
-      console.error(error);
-    });
 }
 
 function displayData(data: any[]) {
@@ -173,51 +82,17 @@ function createStatusBarItem(item: StockItem) {
   return barItem;
 }
 
-function keepDecimal(num: string | number, fixed: number) {
-  var result = parseFloat(String(num));
-  if (isNaN(result)) {
-    return '--';
-  }
-  return result.toFixed(fixed);
-}
-
-function calcFixedNumber(item: StockItem) {
-  var high =
-    String(item.high).indexOf('.') === -1
-      ? 0
-      : String(item.high).length - String(item.high).indexOf('.') - 1;
-  var low =
-    String(item.low).indexOf('.') === -1
-      ? 0
-      : String(item.low).length - String(item.low).indexOf('.') - 1;
-  var open =
-    String(item.open).indexOf('.') === -1
-      ? 0
-      : String(item.open).length - String(item.open).indexOf('.') - 1;
-  var yest =
-    String(item.yestclose).indexOf('.') === -1
-      ? 0
-      : String(item.yestclose).length - String(item.yestclose).indexOf('.') - 1;
-  var updown =
-    String(item.updown).indexOf('.') === -1
-      ? 0
-      : String(item.updown).length - String(item.updown).indexOf('.') - 1;
-  var max = Math.max(high, low, open, yest, updown);
-
-  if (max === 0) {
-    max = 2;
-  }
-
-  return max;
-}
-
 function init() {
   initShowTimeChecker();
   if (isShowTime()) {
     stockCodes = getStockCodes();
     updateInterval = getUpdateInterval();
-    fetchAllData();
-    timer = setInterval(fetchAllData, updateInterval);
+    fetchAllData(displayData, stockCodes);
+    intervalHandle(
+      timer,
+      () => fetchAllData(displayData, stockCodes),
+      updateInterval,
+    );
   } else {
     hideAllStatusBar();
   }
