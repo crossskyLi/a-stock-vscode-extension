@@ -97,18 +97,19 @@ function isShowTime() {
 }
 
 function getItemText(item: StockItem) {
-  return `${item.name.substr(0, 2)} ${keepDecimal(
+  return `${item.name} ${keepDecimal(
     item.price,
     calcFixedNumber(item),
   )} ${item.percent >= 0 ? '⬆' : '⬇'} ${keepDecimal(item.percent * 100, 2)}%`;
 }
 
 function getTooltipText(item: StockItem) {
-  return `code: ${item.type}${item.symbol}
-		涨跌：${item.updown}  百分：${keepDecimal(item.percent * 100, 2)}%\n
-	high: ${item.high}   low:${item.low}\n opening:${item.open}   last：${
-    item.yestclose
-  }`;
+  return `
+    code: ${item.type}${item.symbol}
+		updown: ${item.updown}  percent: ${keepDecimal(item.percent * 100, 2)}%
+	  high: ${item.high}   low: ${item.low}
+    opening:${item.open} last：${item.yestclose}
+  `;
 }
 
 function getItemColor(item: StockItem): string {
