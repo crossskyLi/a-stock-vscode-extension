@@ -8,12 +8,11 @@ export function getItemText(item: StockItem) {
 }
 
 export function getTooltipText(item: StockItem) {
-  return `
-	code: ${item.type}${item.symbol}
-	updown: ${item.updown}  
-	percent: ${keepDecimal(item.percent * 100, 2)}%
-	high: ${item.high}
-	low: ${item.low}
-	opening:${item.open}
-	last：${item.yestclose}`;
+  return `code: ${item.type}${item.symbol}
+updown: ${item.updown}  
+percent: ${keepDecimal(item.percent * 100, 2)}%
+high: ${item.high}
+low: ${item.low}
+opening:${item.open}
+last：${item.yestclose}`;
 }
