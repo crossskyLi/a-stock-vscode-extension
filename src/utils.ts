@@ -1,6 +1,14 @@
 import { StockItem } from './type';
 import * as vscode from 'vscode';
 
+enum StockConfig {
+  stocks = 'stock-watch.stocks',
+  showTime = 'stock-watch.showTime',
+  updateInterval = 'stock-watch.updateInterval',
+  riseColor = 'stock-watch.riseColor',
+  fallColor = 'stock-watch.fallColor',
+}
+
 // 定时器
 export function intervalHandle(
   timer: NodeJS.Timeout | null,
@@ -48,7 +56,7 @@ export function calcFixedNumber(item: StockItem) {
 // 获取配置项的stocks
 export function getStockCodes() {
   const config = vscode.workspace.getConfiguration();
-  const stocks: string[] | undefined = config.get('stock-watch.stocks');
+  const stocks: string[] | undefined = config.get(StockConfig.stocks);
   if (!stocks) {
     return [];
   }
@@ -70,7 +78,7 @@ export function getStockCodes() {
 // 获取当前是否显示时间 根据 showTime 判断
 export function isShowTime() {
   const config = vscode.workspace.getConfiguration();
-  const configShowTime = config.get('stock-watch.showTime');
+  const configShowTime = config.get(StockConfig.showTime);
   let showTime = [0, 23];
   if (
     Array.isArray(configShowTime) &&
@@ -80,20 +88,20 @@ export function isShowTime() {
     showTime = configShowTime;
   }
   const now = new Date().getHours();
-  return now >= showTime[0] && now <= showTime[1];
+  return now >= showTime[0] && now < showTime[1];
 }
 
 // 获取更新间隔时间
 export function getUpdateInterval(): number {
   const config = vscode.workspace.getConfiguration();
-  return config.get('stock-watch.updateInterval') || 3000;
+  return config.get(StockConfig.updateInterval) || 3000;
 }
 
 // 获取每个item 显示的颜色
 export function getItemColor(item: StockItem): string {
   const config = vscode.workspace.getConfiguration();
-  const riseColor: string = config.get('stock-watch.riseColor') || '#444';
-  const fallColor: string = config.get('stock-watch.fallColor') || '#222';
+  const riseColor: string = config.get(StockConfig.riseColor) || '#444';
+  const fallColor: string = config.get(StockConfig.fallColor) || '#222';
 
   return item.percent >= 0 ? riseColor : fallColor;
 }

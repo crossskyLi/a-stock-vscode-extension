@@ -83,7 +83,6 @@ function createStatusBarItem(item: StockItem) {
 }
 
 function init() {
-  initShowTimeChecker();
   if (isShowTime()) {
     stockCodes = getStockCodes();
     updateInterval = getUpdateInterval();
@@ -95,6 +94,7 @@ function init() {
   } else {
     hideAllStatusBar();
   }
+  initShowTimeChecker();
 }
 
 // this method is called when your extension is activated
