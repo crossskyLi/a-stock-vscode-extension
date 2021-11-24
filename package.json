@@ -3,7 +3,7 @@
   "displayName": "a-stock-for-money",
   "description": "stock viewer",
   "publisher": "ram1007",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.62.0"
   },
