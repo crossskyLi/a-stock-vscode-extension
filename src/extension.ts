@@ -87,7 +87,6 @@ function init() {
   if (isShowTime()) {
     stockCodes = getStockCodes();
     updateInterval = getUpdateInterval();
-    fetchAllData(displayData, stockCodes);
     intervalHandle(
       timer,
       () => fetchAllData(displayData, stockCodes),

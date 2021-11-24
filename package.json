@@ -2,6 +2,7 @@
   "name": "a-stock-for-money",
   "displayName": "a-stock-for-money",
   "description": "stock viewer",
+  "publisher": "ram1007",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.62.0"
@@ -61,7 +62,8 @@
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "build:vsce": "yarn package && ts-node ./src/build/vsce-build.ts"
+    "vsce": "yarn package && ts-node ./src/build/vsce-build.ts",
+    "pub": "yarn package && ts-node ./src/build/vsce-publish.ts"
   },
   "devDependencies": {
     "@types/glob": "^7.1.4",
