@@ -1,64 +1,56 @@
-# a-stock-for-money README
+# a stock for money
 
-stocks.
+Watching your stocks when you are coding.
+VScode 插件 | A 股 | 港股 | 实时股票数据
+好好工作，股票涨停！
 
-## Features
+URL: https://github.com/crossskyLi/a-stock-vscode-extension
+Fork from https://github.com/TDGarden/stock-watch 欢迎 PR、star
 
-stock views
+## Configuration
 
-## Requirements
+修改用户配置，添加你所需要监控的股票代码
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+```
+  // 配置需要监控的股票代码
+  // 可根据沪市深市分别加上sh、sz前缀，亦可不加
+  // 不加前缀的情况下，6开头的代码默认加上sh，其余加上sz
+  // 需要查看上证指数，代码为sh000001
 
-## Extension Settings
+  // 港股股票代码前面需要加上hk前缀，如hk09988即可监控阿里巴巴港股
+  // 港股指数代码如下
+  // 1.工商指数: hkHSC
+  // 2.恒生中国企业指数: hkHSCEI
+  // 3.恒生指数: hkHSI
+  // 4.红筹指数: hkHSCCI
+  // 5.恒生金融分类: hkHSF
+  // 6.恒生地产分类: hkHSP
+  // 7.恒生公用事业分类: hkHSU
+  // 8.标普香港创业板指: hkGEM
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+  // 美股股票代码前面需要加上US_前缀，如US_AAPL即可监控苹果股票行情
+  // 美股指数代码如下
+  // 1.道琼斯指数: US_DOWJONES
+  // 2.纳斯达克: US_NASDAQ
+  // 3.标普500: US_SP500
 
-For example:
+  "stock-watch.stocks": [
+    "000001"
+  ],
 
-This extension contributes the following settings:
+  // 配置轮询请求最新数据的时间间隔
+  "stock-watch.updateInterval": 10000
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
 
-## Known Issues
+  // 配置股票涨的颜色，默认为white。为什么不是red，红色像是报错，很刺眼。
+  "stock-watch.riseColor": "white"
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
 
-## Release Notes
+  // 配置股票跌的颜色，默认为green
+  "stock-watch.fallColor": "green"
 
-Users appreciate release notes as you update your extension.
+  // 配置展示的时间段，默认为[9, 15]，每十分钟判断一下
+  "stock-watch.showTime": [9, 15]
 
-### 0.0.1
 
-- 初始化打包
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+```
